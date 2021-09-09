@@ -20,9 +20,11 @@ int main()
 {
     char a[10], b[10];
     printf("Enter the first string: ");
-    scanf("%s", a);
+    //scanf("%s", a);
+    gets(a);
     printf("Enter the second string: ");
-    scanf("%s", b);
+    gets(b);
+    //scanf("%s", b);
     printf("%d", sub(a, b, 0, 0));
     return 0;
 }
