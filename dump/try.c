@@ -1,78 +1,135 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#define Max 100
 
-struct matches
+typedef struct stack
 {
-    int choice;
-    int score;
-};
+    char a[Max];
+    int top;
+} stack;
 
-typedef struct player
-{
-    char pname[20];
-    char tname[20];
-    struct matches m[14];
-} player;
-
-void insert(player **obj, int num)
-{
-    for (int i = 0; i < num; i++)
-    {
-        printf("Enter the Player name: ");
-        scanf("%s", ((*obj) + i)->pname);
-        printf("%s", *((*obj) + i)->pname);
-        printf("Enter the Team name: ");
-        scanf("%s", ((*obj) + i)->tname);
-        for (int j = 0; j < 14; j++)
-        {
-            printf("Enter 'y' if player has played match %d followed by runs scored else 'n'\n", j + 1);
-            //fflush(stdin);
-            char c = getc(stdin);
-            scanf("%c", ((*obj) + i)->m[j].choice);
-            if (((*obj) + i)->m->choice == 'y')
-            {
-                scanf("%d", ((*obj) + i)->m[j].score);
-            }
-        }
-    }
-}
+void init(stack *s);
+void push(stack *s, char ele);
+char pop(stack *s);
+char peek(stack *s);
+int isempty(stack *s);
+int isfull(stack *s);
+int precedence(char token);
+void convert(char *infix, char *postfix);
 
 int main()
 {
-    int num = 2;
-    player *obj;
-    obj = (player *)malloc(2 * sizeof(player));
-    for (int i = 0; i < num; i++)
+    char infix[100];
+    char postfix[100];
+    printf("Enter the expression: ");
+    gets(infix);
+    convert(infix, postfix);
+    printf("%s", &postfix);
+    return 0;
+}
+
+void init(stack *s)
+{
+    s->top = -1;
+}
+
+void push(stack *s, char ele)
+{
+    s->top = s->top + 1;
+    s->a[s->top] = ele;
+}
+
+char pop(stack *s)
+{
+    char x;
+    x = s->a[s->top];
+    s->top = s->top - 1;
+    return x;
+}
+
+char peek(stack *s)
+{
+    return s->a[s->top];
+}
+
+int isempty(stack *s)
+{
+    if (s->top == -1)
     {
-        printf("Enter the Player name: ");
-        fflush(stdin);
-        //gets((obj + i)->pname);
-        scanf("%s", &(obj + i)->pname);
-        fflush(stdin);
-        //printf("%s", (obj + i)->pname);
-        printf("Enter the Team name: ");
-        //gets((obj + i)->tname);
-        scanf("%s", &(obj + i)->tname);
-        fflush(stdin);
-        for (int j = 0; j < 14; j++)
-        {
-            printf("Enter\n 1 if player has played match %d followed by runs scored else enter 0: ", j + 1);
-            //(obj + i)->m[j].choice = getc(stdin);
-            scanf("%d", &(obj + i)->m[j].choice);
-            fflush(stdin);
-            //char c = getc(stdin);
-            //fflush(stdin);
-            //printf("%c", (obj + i)->m->choice);
-            if ((obj + i)->m[j].choice == 1)
-            {
-                scanf("%d", &(obj + i)->m[j].score);
-                fflush(stdin);
-            }
-            else
-            {
-                (obj + i)->m[j].score = -1;
-            }
-        }
+        return 1;
     }
     return 0;
+}
+
+int isfull(stack *s)
+{
+    if (s->top == Max)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int precedence(char token)
+{
+    if (token == '+' || token == '-')
+    {
+        return 1;
+    }
+    else if (token == '*' || token == '/')
+    {
+        return 2;
+    }
+    else if (token == '^')
+        return 3;
+    else
+        return -1;
+}
+
+void convert(char *infix, char *postfix)
+{
+    stack s;
+    init(&s);
+    char token;
+    char x;
+    int i;
+    int p;
+    p = 0;
+    for (i = 0; infix[i] != '\0'; i++)
+    {
+        token = infix[i];
+        if (isalnum(token))
+        {
+            postfix[p++] = token;
+        }
+        else if (token == '(')
+        {
+            push(&s, token);
+        }
+        else if (token == ')')
+        {
+            while (peek(&s) != '(' && !isempty(&s))
+            {
+                postfix[p++] = pop(&s);
+            }
+            pop(&s);
+        }
+        else
+        {
+            while (precedence(token) <= precedence(peek(&s)) && !isempty(&s))
+            {
+                x = pop(&s);
+                postfix[p++] = x;
+            }
+            push(&s, token);
+        }
+    }
+    while (!isempty(&s))
+    {
+        x = pop(&s);
+        postfix[p++] = x;
+    }
+    postfix[p++] = '\0';
 }
