@@ -1,9 +1,0 @@
-{
-	"server" : {
-		"host" : "localhost",
-		"port" : 5200
-	},
-	"database" : {
-		"uri": "mongodb://localhost/fav"
-	}
-}
