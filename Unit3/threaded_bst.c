@@ -93,7 +93,7 @@ void inorder(tnode *root)
     tnode *curr = root;
     while (curr->lchild != NULL)
         curr = curr->lchild;
-    while (curr->rchild != NULL)
+    while (curr != NULL)
     {
         printf("%d\n", curr->data);
         curr = insucc(curr);
