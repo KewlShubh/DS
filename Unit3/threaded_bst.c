@@ -13,8 +13,10 @@ typedef struct tnode
 tnode *init(int data)
 {
     tnode *temp = (tnode *)malloc(sizeof(tnode));
-    temp->lchild = temp->rchild = NULL;
-    temp->lthread = temp->rthread = 1;
+    temp->lchild = NULL;
+    temp->rchild = NULL;
+    temp->lthread = 1;
+    temp->rthread = 1;
     temp->data = data;
     return temp;
 }
@@ -37,6 +39,7 @@ void createBST(tnode **root, int data)
                 if (prev->rthread == 1)
                 {
                     flag = 1;
+                    break;
                 }
                 else
                 {
@@ -62,7 +65,7 @@ void createBST(tnode **root, int data)
             prev->rchild = temp;
             prev->rthread = 0;
         }
-        else
+        else if (flag == 2)
         {
             temp->rchild = prev;
             temp->lchild = prev->lchild;
@@ -72,11 +75,39 @@ void createBST(tnode **root, int data)
     }
 }
 
+tnode *insucc(tnode *root)
+{
+    if (root->rthread == 1)
+        root = root->rchild;
+    else
+    {
+        root = root->rchild;
+        while (root->lthread != 1)
+            root = root->lchild;
+    }
+    return root;
+}
+
+void inorder(tnode *root)
+{
+    tnode *curr = root;
+    while (curr->lchild != NULL)
+        curr = curr->lchild;
+    while (curr->rchild != NULL)
+    {
+        printf("%d\n", curr->data);
+        curr = insucc(curr);
+    }
+}
+
 int main()
 {
     tnode *root = NULL;
     createBST(&root, 10);
+    createBST(&root, 5);
+    createBST(&root, 7);
     createBST(&root, 50);
     createBST(&root, 1);
+    inorder(root);
     return 0;
 }
