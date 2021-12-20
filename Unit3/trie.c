@@ -64,8 +64,45 @@ int searchNode(trie *root, char *str, char *check, int length)
     }
 }
 
-trie *deleteNode(trie *root, char *str)
+int isEmpty(trie *root)
 {
+    for (int i = 0; i < 26; i++)
+    {
+        if (root->child[i] != NULL)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+trie *deleteNode(trie *root, char *str, int level, int length)
+{
+    if (root == NULL)
+    {
+        return root;
+    }
+    if (length == level)
+    {
+        if (root->isEnd == 1)
+        {
+            root->isEnd = 0;
+        }
+        if (isEmpty(root))
+        {
+            free(root);
+            root = NULL;
+        }
+        return root;
+    }
+    int index = str[level] - 'a';
+    root->child[index] = deleteNode(root->child[index], str, level + 1, length);
+    if (root->isEnd == 0 && isEmpty(root))
+    {
+        free(root);
+        root = NULL;
+    }
+    return root;
 }
 
 void display(trie *root, char *str, int level)
@@ -93,11 +130,13 @@ int main()
     trie *root = newNode();
     char str[100];
     char check[100];
-    root = insertNode(root, "ana");
+    root = insertNode(root, "anab");
     root = insertNode(root, "anana");
     root = insertNode(root, "hola");
     root = insertNode(root, "banaa");
     display(root, str, 0);
-    searchNode(root, "banana", check, 0);
+    printf("\n");
+    root = deleteNode(root, "anab", 0, 4);
+    display(root, str, 0);
     return 0;
 }
